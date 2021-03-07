@@ -1,32 +1,42 @@
 import React from "react";
-
+import PropTypes from "prop-types";
+import clsx from "clsx";
+import { Switch, Grid, TextField, Typography, Button } from "@material-ui/core";
+import DateFnsUtils from "@date-io/date-fns";
 import {
-  Switch,
-  Grid,
-  TextField,
-  Typography,
-  Button,
-  Paper
-} from "@material-ui/core";
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker
+} from "@material-ui/pickers";
+import { lighten, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
+import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
-import DeleteIcon from "@material-ui/icons/Delete";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
+import Toolbar from "@material-ui/core/Toolbar";
+import EnhancedTableHead from "@material-ui/core/TableHead";
+import Paper from "@material-ui/core/Paper";
+import Checkbox from "@material-ui/core/Checkbox";
+import IconButton from "@material-ui/core/IconButton";
+import Tooltip from "@material-ui/core/Tooltip";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import { makeStyles } from "@material-ui/core/styles";
+import AddIcon from "@material-ui/icons/Add";
+
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import FormHelperText from "@material-ui/core/FormHelperText";
-
-export default class Customer extends React.Component {
+import DeleteIcon from "@material-ui/icons/Delete";
+import FilterListIcon from "@material-ui/icons/FilterList";
+export default class CustomerDetails extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -34,13 +44,11 @@ export default class Customer extends React.Component {
       name: "",
       address: "",
       phoneNumber: "",
-      transactionDate: "",
-      amount: "",
+      emailId: "",
       status: "Unpaid",
       open: false
     };
   }
-
   handleInput1 = (e) => {
     this.setState({
       name: e.target.value
@@ -58,15 +66,10 @@ export default class Customer extends React.Component {
       phoneNumber: e.target.value
     });
   };
-  handleInput4 = (e) => {
-    this.setState({
-      transactionDate: e.target.value
-    });
-  };
 
   handleInput5 = (e) => {
     this.setState({
-      amount: e.target.value
+      emailId: e.target.value
     });
   };
   handleInput6 = (e) => {
@@ -81,7 +84,7 @@ export default class Customer extends React.Component {
     this.setState({ open: false, status: "unpaid" });
   };
 
-  handleAdd = (e) => {
+  handleAdd = () => {
     var a1 = this.state.a;
 
     a1.push({
@@ -137,7 +140,8 @@ export default class Customer extends React.Component {
           }}
           onClick={this.openDialog}
         >
-          add new customer
+          <AddIcon />
+          Add New
         </Button>
         <Dialog
           open={this.state.open}
@@ -145,7 +149,7 @@ export default class Customer extends React.Component {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">{"add new cutomer"}</DialogTitle>
+          <DialogTitle id="alert-dialog-title">{"New client"}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
               <center>
@@ -159,7 +163,16 @@ export default class Customer extends React.Component {
                   onChange={this.handleInput1}
                 />
                 <br />
-
+                <TextField
+                  label="Email Id"
+                  required="true"
+                  margin="dense"
+                  variant="outlined"
+                  required="true"
+                  value={this.state.emailId}
+                  onChange={this.handleInput5}
+                />
+                <br />
                 <TextField
                   label="address"
                   required="true"
@@ -177,11 +190,11 @@ export default class Customer extends React.Component {
                   margin="dense"
                   type="number"
                   variant="outlined"
+                  size="small"
                   value={this.state.phoneNumber}
                   onChange={this.handleInput3}
                 />
 
-                <br />
                 <FormControl
                   required
                   variant="outlined"
@@ -200,41 +213,6 @@ export default class Customer extends React.Component {
                   </Select>
                   <FormHelperText>Required</FormHelperText>
                 </FormControl>
-                <br />
-                {this.state.status === "Paid" ? (
-                  <TextField
-                    label="Amount"
-                    required="true"
-                    margin="dense"
-                    variant="outlined"
-                    type="number"
-                    value={this.state.amount}
-                    onChange={this.handleInput5}
-                  />
-                ) : (
-                  ""
-                )}
-                <br />
-                {this.state.status === "Paid" ? (
-                  <form className={this.state.container}>
-                    <TextField
-                      margin="dense"
-                      variant="outlined"
-                      id="date-picker-dialog"
-                      label="trasaction date"
-                      type="date"
-                      value={this.state.transactionDate}
-                      onChange={this.handleInput4}
-                      defaultValue=""
-                      className={this.state.textField}
-                      InputLabelProps={{
-                        shrink: true
-                      }}
-                    />
-                  </form>
-                ) : (
-                  ""
-                )}
               </center>
             </DialogContentText>
           </DialogContent>
@@ -254,27 +232,33 @@ export default class Customer extends React.Component {
                 this.state.address === "" ||
                 this.state.phoneNumber === "" ||
                 this.state.status === "" ||
-                (this.state.status === "Paid" && this.state.amount === "") ||
-                (this.state.status === "Paid" &&
-                  this.state.transactionDate === "")
-                  ? true
-                  : false
+                this.state.emailId === ""
               }
               onClick={this.handleAdd}
             >
+              <AddIcon />
               add
             </Button>
           </DialogActions>
         </Dialog>
         <center>
           <TableContainer component={Paper}>
-            <h1>CLIENT DETAILS</h1>
-            <Table stickyHeader aria-label="sticky table">
+            <h1>CLIENTS</h1>
+            <Table EnhancedTableHead aria-label="enhanced table">
+              <EnhancedTableHead />
               <TableHead>
                 <TableRow>
-                  <TableCell>Id</TableCell>
-                  <TableCell align="right">Name</TableCell>
-                  <TableCell align="right">Address</TableCell>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={this.isItemSelected}
+                      inputProps={{
+                        "aria-labelledby": this.labelId
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>Customer</TableCell>
+
+                  <TableCell align="right">created on</TableCell>
                   <TableCell align="right">ContactNum</TableCell>
                   <TableCell align="right">Transaction Date</TableCell>
                   <TableCell align="right">Amount</TableCell>
@@ -285,40 +269,56 @@ export default class Customer extends React.Component {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {this.state.a.map((obj, index, phoneNumber) => {
-                  return (
-                    <TableRow key={index}>
-                      <TableCell component="th" scope="row">
-                        {obj.Id}
-                      </TableCell>
-
-                      <TableCell align="right">{obj.name}</TableCell>
-                      <TableCell align="right">{obj.address}</TableCell>
-                      <TableCell align="right">{obj.phoneNumber}</TableCell>
-                      <TableCell align="right">{obj.transactionDate}</TableCell>
-                      <TableCell align="right">{obj.amount}</TableCell>
-                      <TableCell align="right">{obj.status}</TableCell>
-
-                      <TableCell
-                        style={{ paddingRight: "114px" }}
-                        align="right"
-                      >
-                        <Button
-                          className="btn"
-                          onClick={(e) => {
-                            this.handleDelete(e, phoneNumber);
-                          }}
-                          style={{
-                            backgroundColor: "darkred"
-                          }}
-                          size="small"
+                {this.state.a.map(
+                  (obj, index, name, isItemSelected, labelId) => {
+                    isItemSelected = () => obj.name;
+                    labelId = `enhanced-table-checkbox-${index}`;
+                    return (
+                      <TableRow role="checkbox" key={index}>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={this.isItemSelected}
+                            inputProps={{
+                              "aria-labelledby": labelId
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell
+                          id={labelId}
+                          scope="row"
+                          component="th"
+                          scope="row"
                         >
-                          <DeleteIcon />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                          {obj.name}
+                        </TableCell>
+
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right">{obj.status}</TableCell>
+
+                        <TableCell
+                          style={{ paddingRight: "114px" }}
+                          align="right"
+                        >
+                          <Button
+                            className="btn"
+                            onClick={(e) => {
+                              this.handleDelete(e, name);
+                            }}
+                            style={{
+                              backgroundColor: "darkred"
+                            }}
+                            size="small"
+                          >
+                            <DeleteIcon />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
+                )}
               </TableBody>
             </Table>
           </TableContainer>

@@ -1,12 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
-import DataTable from "./components/t2";
+
+import CustomerDetails from "./components/coustomer";
 import reportWebVitals from "./reportWebVitals";
 
 ReactDOM.render(
   <React.StrictMode>
-    <DataTable />
+    <CustomerDetails />
   </React.StrictMode>,
   document.getElementById("root")
 );
